@@ -17,14 +17,16 @@ model FieldTags {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Resume {
-  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  object_key     String?
-  created_by     String?          @db.Uuid
-  created_at     DateTime         @default(now()) @db.Timestamptz(6)
-  Users          Users?           @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  ResumeComments ResumeComments[]
-  ResumeField    ResumeField[]
-  UserResume     UserResume[]
+  id               String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  object_key       String?
+  created_by       String?          @db.Uuid
+  created_at       DateTime         @default(now()) @db.Timestamptz(6)
+  public           Boolean?         @default(true)
+  engagement_score BigInt?          @default(0)
+  Users            Users?           @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ResumeComments   ResumeComments[]
+  ResumeField      ResumeField[]
+  UserResume       UserResume[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -86,9 +88,7 @@ model UserResume {
 model Users {
   id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
-  username       String?
-  password       String?
-  verified       Boolean?         @default(false)
+  auth0_id       String?
   Resume         Resume[]
   ResumeComments ResumeComments[]
   ResumeReplies  ResumeReplies[]

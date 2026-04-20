@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 'use strict';
 
-require("dotenv").config();
+import "dotenv/config";
+
+import { auth } from "express-oauth2-jwt-bearer";
 
 const port = (() => {
     const args = process.argv;
@@ -20,18 +22,30 @@ const port = (() => {
     return num;
 })();
 
-const express = require("express");
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 const app = express();
 
 app.use(express.json());
 
-// app.use(cors({
-//     origin: process.env.FRONTEND_URL,
-//     methods: ['GET', 'POST', 'PUT', 'PATCH','DELETE'],
-//     allowedHeaders: ['Content-Type', 'Authorization'],
-//     credentials: true
-// }));
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ['GET', 'POST', 'PUT', 'PATCH','DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+const jwtCheck = auth({
+  issuerBaseURL: process.env.ISSUER_BASE_URL,
+  audience: "readsume_api",
+  tokenSigningAlg: 'RS256'
+});
+
+// enforce on all endpoints
+app.use(jwtCheck);
+
+import userRoutes from "./routes/user.js";
+app.use("/users", userRoutes);
 
 const server = app.listen(port, () => {
     console.log(`Server running on port ${port}`);

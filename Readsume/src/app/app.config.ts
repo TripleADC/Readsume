@@ -1,6 +1,9 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideAuth0 } from '@auth0/auth0-angular';
+import { provideAuth0, authHttpInterceptorFn } from '@auth0/auth0-angular';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+
+import { environment } from '../environments/environment';
 
 import { routes } from './app.routes';
 
@@ -9,11 +12,25 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
     provideAuth0({
-      domain: "dev-5xjacdlbr0modiu5.us.auth0.com",
-      clientId: "zFSWMg5IH4UJk5YeQDVpy3YWUT3qVEfU",
+      domain: environment.domain,
+      clientId: environment.clientId,
       authorizationParams: {
         redirect_uri: window.location.origin,
+        audience: 'readsume_api'
       },
+      httpInterceptor: {
+        allowedList: [
+          {
+            uri: "http://localhost:3000/*",
+            tokenOptions: {
+              authorizationParams: {
+                audience: "readsume_api"
+              }
+            }
+          }
+        ]
+      }
     }),
+    provideHttpClient(withInterceptors([authHttpInterceptorFn]))
   ]
 };

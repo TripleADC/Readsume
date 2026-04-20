@@ -1,0 +1,18 @@
+@if (auth.isLoading$ | async) 
+{
+
+  <div>Loading...</div>
+
+} 
+@else 
+{
+
+      @if (auth.error$ | async; as error) {
+        <p>Error: {{ error.message }}</p>
+      }
+
+    <button (click)="auth.loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })">
+      Sign Up
+    </button>
+    <button (click)="auth.loginWithRedirect()">Log In</button>
+}
