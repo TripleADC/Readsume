@@ -23,6 +23,7 @@ model Resume {
   created_at       DateTime         @default(now()) @db.Timestamptz(6)
   public           Boolean?         @default(true)
   engagement_score BigInt?          @default(0)
+  public_url       String?
   Users            Users?           @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ResumeComments   ResumeComments[]
   ResumeField      ResumeField[]
@@ -36,6 +37,10 @@ model ResumeComments {
   resume_for    String?         @db.Uuid
   created_by    String?         @db.Uuid
   comment       String?
+  position_top  Decimal?        @db.Decimal
+  position_left Decimal?        @db.Decimal
+  box_width     Decimal?        @db.Decimal
+  box_height    Decimal?        @db.Decimal
   Users         Users?          @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Resume        Resume?         @relation(fields: [resume_for], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ResumeReplies ResumeReplies[]

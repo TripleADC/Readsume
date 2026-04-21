@@ -40,12 +40,16 @@ const jwtCheck = auth({
   audience: "readsume_api",
   tokenSigningAlg: 'RS256'
 });
-
-// enforce on all endpoints
 app.use(jwtCheck);
 
+import dbAuth from "./middleware/dbAuth.js";
+
+import resumeRoutes from "./routes/resume.js";
 import userRoutes from "./routes/user.js";
+
+app.use("/resumes", dbAuth, resumeRoutes);
 app.use("/users", userRoutes);
+
 
 const server = app.listen(port, () => {
     console.log(`Server running on port ${port}`);

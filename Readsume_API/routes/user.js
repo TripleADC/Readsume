@@ -4,13 +4,13 @@ const router = express.Router();
 import multer from 'multer';
 const upload = multer({ storage: multer.memoryStorage() });
 
-import prisma from '../prisma.js';
+import prisma_client from '../prisma_client.js';
 
 // Create user, using
 router.post("/", async (req, res) => { 
     const auth0_id = req.auth.payload.sub;
 
-    const foundUser = await prisma.users.findFirst({
+    const foundUser = await prisma_client.users.findFirst({
         where: {
             auth0_id: auth0_id
         }
@@ -23,7 +23,7 @@ router.post("/", async (req, res) => {
     }
 
     try {
-        const createdUser = await prisma.users.create({
+        const createdUser = await prisma_client.users.create({
             data: {
                 created_at: new Date(),
                 auth0_id: auth0_id
