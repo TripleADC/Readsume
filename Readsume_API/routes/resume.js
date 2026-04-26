@@ -84,15 +84,17 @@ router.get("/:resumeId", async (req, res) => {
 
 // Uploading a resume
 // Getting the file, uploading that file to supabase storage then linking it with user
+// Fields is a comma seperated string
 router.post("/", upload.single("file"), async (req, res) => { 
 	const file = req.file;
     const loggedInUser = req.user;
+    const fieldList = req.body.fieldList;
 
     let path = "";
     let public_url = "";
 
-    if (file == null) {
-      return res.status(400).json({ error: "No file uploaded" });
+    if (file == null || fieldList == null || fieldList == "") {
+      return res.status(400).json({ error: "Required fields are null" });
     }
 
     // Making unique file name
@@ -137,9 +139,12 @@ router.post("/", upload.single("file"), async (req, res) => {
         return res.status(500).json({ error: "Unable to get public URL for resume" });
     }
 
+    // Seperating field list
+    const fieldArr = fieldList.split(",").map(x => parseInt(x));
+
     // Creating resume record
     try {
-        await prisma_client.resume.create({
+        const createdResume = await prisma_client.resume.create({
             data: {
                 created_at: new Date(),
                 public: true,
@@ -148,6 +153,16 @@ router.post("/", upload.single("file"), async (req, res) => {
                 created_by: loggedInUser.id,
                 engagement_score: 0
             }
+        });
+
+        await prisma_client.$transaction(async (transact) => {
+            // Putting all of them
+            await transact.resumeField.createMany({
+                data: fieldArr.map(field => ({
+                    resume: createdResume.id,
+                    field: field
+                }))
+            });
         });
 
         res.status(200).json({ msg: "Resume successfully created"});
@@ -159,8 +174,13 @@ router.post("/", upload.single("file"), async (req, res) => {
 });
 
 // Making a resume public or private (toggle)
-router.patch("/", async (req, res) => { 
+router.patch("/status", async (req, res) => { 
     const resumeId = req.body.resumeId;
+
+    if (resumeId == null)
+    {
+        return res.status(400).json({ error: "Resume is null" });
+    }
 
     const resumeToEdit = await prisma_client.resume.findFirst({
         where: {
@@ -184,14 +204,65 @@ router.patch("/", async (req, res) => {
             }
         })
 
-        return res.status(200).json({ msg: "Resume successfully updated" });
+        return res.status(200).json({ msg: "Resume status successfully updated" });
+    }
+    catch
+    {
+        return res.status(500).json({ error: "Unable to update resume status" });
+    }
+});
+
+// Assigning a resume their fields
+// Fields is a comma seperated string
+router.patch("/fields", async (req, res) => {
+    const resumeId = req.body.resumeId;
+    const fieldList = req.body.fieldList;
+
+    if (resumeId == null || fieldList == null || fieldList == "")
+    {
+        return res.status(400).json({ error: "Required fields are null or empty" });
+    }
+
+    const resumeToEdit = await prisma_client.resume.findFirst({
+        where: {
+            id: resumeId
+        }
+    });
+
+    if (resumeToEdit == null)
+    {
+        return res.status(400).json({ error: "Resume not found" });
+    }
+
+    // Seperating field list
+    const fieldArr = fieldList.split(",").map(x => parseInt(x));
+
+    try 
+    {
+        await prisma_client.$transaction(async (transact) => {
+
+            // Starting fresh
+            await transact.resumeField.deleteMany({
+                where: {
+                    resume: resumeId
+                }
+            });
+
+            // Putting all of them
+            await transact.resumeField.createMany({
+                data: fieldArr.map(field => ({
+                    resume: resumeId,
+                    field: field
+                }))
+            });
+        });
+
+        return res.status(200).json({ msg: "Resume fields successfully updated" });
     }
     catch
     {
         return res.status(500).json({ error: "Unable to update resume" });
     }
 });
-
-
 
 export default router;
