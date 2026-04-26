@@ -88,12 +88,12 @@ router.get("/:resumeId", async (req, res) => {
 router.post("/", upload.single("file"), async (req, res) => { 
 	const file = req.file;
     const loggedInUser = req.user;
-    const fieldList = req.body.fieldList;
+    const fieldIds= req.body.fieldIds;
 
     let path = "";
     let public_url = "";
 
-    if (file == null || fieldList == null || fieldList == "") {
+    if (file == null || fieldIds == null || fieldIds == []) {
       return res.status(400).json({ error: "Required fields are null" });
     }
 
@@ -139,9 +139,6 @@ router.post("/", upload.single("file"), async (req, res) => {
         return res.status(500).json({ error: "Unable to get public URL for resume" });
     }
 
-    // Seperating field list
-    const fieldArr = fieldList.split(",").map(x => parseInt(x));
-
     // Creating resume record
     try {
         const createdResume = await prisma_client.resume.create({
@@ -158,7 +155,7 @@ router.post("/", upload.single("file"), async (req, res) => {
         await prisma_client.$transaction(async (transact) => {
             // Putting all of them
             await transact.resumeField.createMany({
-                data: fieldArr.map(field => ({
+                data: fieldIds.map(field => ({
                     resume: createdResume.id,
                     field: field
                 }))
@@ -216,9 +213,9 @@ router.patch("/status", async (req, res) => {
 // Fields is a comma seperated string
 router.patch("/fields", async (req, res) => {
     const resumeId = req.body.resumeId;
-    const fieldList = req.body.fieldList;
+    const fieldIds = req.body.fieldIds;
 
-    if (resumeId == null || fieldList == null || fieldList == "")
+    if (resumeId == null || fieldIds == null || fieldIds == [])
     {
         return res.status(400).json({ error: "Required fields are null or empty" });
     }
@@ -234,9 +231,6 @@ router.patch("/fields", async (req, res) => {
         return res.status(400).json({ error: "Resume not found" });
     }
 
-    // Seperating field list
-    const fieldArr = fieldList.split(",").map(x => parseInt(x));
-
     try 
     {
         await prisma_client.$transaction(async (transact) => {
@@ -250,9 +244,10 @@ router.patch("/fields", async (req, res) => {
 
             // Putting all of them
             await transact.resumeField.createMany({
-                data: fieldArr.map(field => ({
+                data: fieldIds.map(field => ({
                     resume: resumeId,
-                    field: field
+                    field: field,
+                    created_at: new Date()
                 }))
             });
         });
