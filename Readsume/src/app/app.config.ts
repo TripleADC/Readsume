@@ -29,7 +29,8 @@ export const appConfig: ApplicationConfig = {
             }
           }
         ]
-      }
+      },
+      errorPath: '/login',
     }),
     provideHttpClient(withInterceptors([authHttpInterceptorFn]))
   ]

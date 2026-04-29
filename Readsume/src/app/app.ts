@@ -5,6 +5,8 @@ import { inject } from '@angular/core';
 import { AuthService } from '@auth0/auth0-angular';
 import { CommonModule } from '@angular/common';
 
+import { initFlowbite } from 'flowbite';
+
 @Component({
   selector: 'app-root',
   imports: [
@@ -18,4 +20,8 @@ export class App {
   protected readonly title = signal('Readsume');
   protected readonly window = window;
   protected auth = inject(AuthService);
+
+  ngOnInit(): void {
+    initFlowbite();
+  }
 }
