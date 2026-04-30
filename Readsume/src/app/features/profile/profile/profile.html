@@ -1,0 +1,20 @@
+<div class="container mx-4 my-4">
+    @if (pdfSrc != null)
+    {
+        <pdf-viewer [src]="pdfSrc"
+                [render-text]="true"
+                [original-size]="false"
+                style="width: 800px; height: 900px"
+        ></pdf-viewer>
+    }
+
+    <input class="mt-4 cursor-pointer bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full shadow-xs placeholder:text-body" 
+        type="file"
+        accept=".pdf"
+        (change)="onFileSelected($event)">
+
+    <button type="button" class="mt-4 cursor-pointer text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+        (click)="submitResume()"
+        [disabled]="pdfForm.invalid">Submit
+    </button>
+</div>

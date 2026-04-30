@@ -1,13 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-
-const jwt = require("jsonwebtoken");
+import prisma_client from "../prisma_client.js";
 
 const dbAuth = async (req, res, next) => { 
     const auth0_id = req.auth.payload.sub;
 
     // Check if user actually exists
-    const loggedInUser = await prisma.users.findFirst({
+    const loggedInUser = await prisma_client.users.findFirst({
         where: {
             auth0_id: auth0_id
         }

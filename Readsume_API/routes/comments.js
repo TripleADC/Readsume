@@ -28,7 +28,7 @@ router.post("/:resumeId", async (req, res) => {
         position_top == null || position_left == null ||
         box_width == null || box_height == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const resumeToComment = await prisma_client.resume.findFirst({
@@ -39,7 +39,7 @@ router.post("/:resumeId", async (req, res) => {
 
     if (resumeToComment == null)
     {
-        return res.status(400).json({ error: "Unable to find resume" });
+        return res.status(400).json({ msg: "Unable to find resume" });
     }
 
     try 
@@ -86,7 +86,7 @@ router.patch("/:commentId", async (req, res) => {
 
     if (commentId == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const commentToEdit = await prisma_client.resumeComments.findFirst({
@@ -97,7 +97,7 @@ router.patch("/:commentId", async (req, res) => {
 
     if (commentToEdit == null)
     {
-        return res.status(400).json({ error: "Unable to find comment" });
+        return res.status(400).json({ msg: "Unable to find comment" });
     }
 
     try 
@@ -126,7 +126,7 @@ router.delete("/:commentId", async (req, res) => {
 
     if (commentId == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const commentToDelete = await prisma_client.resumeComments.findFirst({
@@ -137,7 +137,7 @@ router.delete("/:commentId", async (req, res) => {
 
     if (commentToDelete == null)
     {
-        return res.status(400).json({ error: "Unable to find comment" });
+        return res.status(400).json({ msg: "Unable to find comment" });
     }
 
     try 

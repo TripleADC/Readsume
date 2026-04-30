@@ -22,7 +22,7 @@ router.post("/:commentId", async (req, res) => {
 
     if (commentId == null || reply == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const commentToReply = await prisma_client.resumeComments.findFirst({
@@ -33,7 +33,7 @@ router.post("/:commentId", async (req, res) => {
 
     if (commentToReply == null)
     {
-        return res.status(400).json({ error: "Unable to find comment to reply to" });
+        return res.status(400).json({ msg: "Unable to find comment to reply to" });
     }
 
     try 
@@ -76,7 +76,7 @@ router.post("/reply/:replyId", async (req, res) => {
 
     if (replyId == null || reply == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const replyToReply = await prisma_client.resumeReplies.findFirst({
@@ -87,7 +87,7 @@ router.post("/reply/:replyId", async (req, res) => {
 
     if (replyToReply == null)
     {
-        return res.status(400).json({ error: "Unable to find reply to reply to" });
+        return res.status(400).json({ msg: "Unable to find reply to reply to" });
     }
 
     const commentForReply = await prisma_client.resumeComments.findFirst({
@@ -98,7 +98,7 @@ router.post("/reply/:replyId", async (req, res) => {
 
     if (commentForReply == null)
     {
-        return res.status(400).json({ error: "Unable to find comment to reply to" });
+        return res.status(400).json({ msg: "Unable to find comment to reply to" });
     }
 
     try 
@@ -142,7 +142,7 @@ router.patch(":/replyId", async (req, res) => {
 
     if (replyId == null || reply == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const replyToEdit = await prisma_client.resumeReplies.findFirst({
@@ -153,7 +153,7 @@ router.patch(":/replyId", async (req, res) => {
 
     if (replyToEdit == null)
     {
-        return res.status(400).json({ error: "Unable to find reply to edit" });
+        return res.status(400).json({ msg: "Unable to find reply to edit" });
     }
 
     try 
@@ -185,7 +185,7 @@ router.delete("/:replyId", async (req, res) => {
 
     if (replyId == null || reply == null)
     {
-        return res.status(400).json({ error: "Required fields are null" });
+        return res.status(400).json({ msg: "Required fields are null" });
     }
 
     const replyToDelete = await prisma_client.resumeReplies.findFirst({
@@ -196,7 +196,7 @@ router.delete("/:replyId", async (req, res) => {
 
     if (replyToDelete == null)
     {
-        return res.status(400).json({ error: "Unable to find reply to delete" });
+        return res.status(400).json({ msg: "Unable to find reply to delete" });
     }
 
     // Not actually deleting the comment to preserve threads

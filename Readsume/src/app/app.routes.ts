@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { Layout } from './core/layout/layout/layout';
 import { Home } from './core/home/home';
 import { Login } from './core/login/login';
+import { Profile } from './features/profile/profile/profile';
 
 import { AuthGuard } from '@auth0/auth0-angular';
 
@@ -24,6 +25,10 @@ export const routes: Routes = [
                 path: 'home',
                 component: Home
             },
+            {
+                path: 'profile',
+                component: Profile
+            }
         ],
     },
     {

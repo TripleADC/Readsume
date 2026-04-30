@@ -88,22 +88,26 @@ router.get("/:resumeId", async (req, res) => {
 router.post("/", upload.single("file"), async (req, res) => { 
 	const file = req.file;
     const loggedInUser = req.user;
-    const fieldIds= req.body.fieldIds;
+
+    // TENTATIVE -- WILL MAKE FIELD DYNAMIC
+    const fieldIds = [1];
+    // const fieldIds= req.body.fieldIds;
 
     let path = "";
     let public_url = "";
 
     if (file == null || fieldIds == null || fieldIds == []) {
-      return res.status(400).json({ error: "Required fields are null" });
+      return res.status(400).json({ msg: "Required fields are null" });
     }
 
     // Making unique file name
     const ext = allowed[file.mimetype];
-    if (ext != null) {
-        return res.status(400).json({ error: "Invalid file type" });
+    if (ext == null) {
+        return res.status(400).json({ msg: "Invalid file type" });
     }
 
-    const filePath = `resumes/${auth0_id}/${Date.now()}.${ext}`;
+    const sanitizedId = loggedInUser.id.replace(/\|/g, "_");
+    const filePath = `resumes/${sanitizedId}/${Date.now()}.${ext}`;
 
     try 
     {
@@ -120,9 +124,10 @@ router.post("/", upload.single("file"), async (req, res) => {
         
             path = data.path;
     }
-    catch
+    catch (err)
     {
-        return res.status(500).json({ error: "Resume unable to be uploaded" });
+        console.error("Supabase upload error:", err);
+        return res.status(500).json({ msg: "Resume unable to be uploaded" });
     }
 
     // Getting public url
@@ -136,7 +141,7 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
     catch
     {
-        return res.status(500).json({ error: "Unable to get public URL for resume" });
+        return res.status(500).json({ msg: "Unable to get public URL for resume" });
     }
 
     // Creating resume record
@@ -166,7 +171,7 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
     catch
     {
-        res.status(500).json({ error: "Resume unable to be created"});
+        res.status(500).json({ msg: "Resume unable to be created"});
     }
 });
 
@@ -176,7 +181,7 @@ router.patch("/status", async (req, res) => {
 
     if (resumeId == null)
     {
-        return res.status(400).json({ error: "Resume is null" });
+        return res.status(400).json({ msg: "Resume is null" });
     }
 
     const resumeToEdit = await prisma_client.resume.findFirst({
@@ -187,7 +192,7 @@ router.patch("/status", async (req, res) => {
 
     if (resumeToEdit == null)
     {
-        return res.status(400).json({ error: "Resume not found" });
+        return res.status(400).json({ msg: "Resume not found" });
     }
 
     try 
@@ -205,7 +210,7 @@ router.patch("/status", async (req, res) => {
     }
     catch
     {
-        return res.status(500).json({ error: "Unable to update resume status" });
+        return res.status(500).json({ msg: "Unable to update resume status" });
     }
 });
 
@@ -217,7 +222,7 @@ router.patch("/fields", async (req, res) => {
 
     if (resumeId == null || fieldIds == null || fieldIds == [])
     {
-        return res.status(400).json({ error: "Required fields are null or empty" });
+        return res.status(400).json({ msg: "Required fields are null or empty" });
     }
 
     const resumeToEdit = await prisma_client.resume.findFirst({
@@ -228,7 +233,7 @@ router.patch("/fields", async (req, res) => {
 
     if (resumeToEdit == null)
     {
-        return res.status(400).json({ error: "Resume not found" });
+        return res.status(400).json({ msg: "Resume not found" });
     }
 
     try 
@@ -256,7 +261,7 @@ router.patch("/fields", async (req, res) => {
     }
     catch
     {
-        return res.status(500).json({ error: "Unable to update resume" });
+        return res.status(500).json({ msg: "Unable to update resume" });
     }
 });
 

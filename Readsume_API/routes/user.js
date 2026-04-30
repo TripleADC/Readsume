@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
     } 
     catch (err) 
     {
-        return res.status(500).json({ error: "Failed to create user" });
+        return res.status(500).json({ msg: "Failed to create user" });
     }
 });
 
@@ -44,7 +44,7 @@ router.patch("/fields", async (req, res) => {
 
     if (fieldIds == null || fieldIds == [])
     {
-        return res.status(400).json({ error: "Required fields are null or empty" });
+        return res.status(400).json({ msg: "Required fields are null or empty" });
     }
 
     try 
@@ -72,7 +72,7 @@ router.patch("/fields", async (req, res) => {
     }
     catch
     {
-        return res.status(500).json({ error: "Unable to update user" });
+        return res.status(500).json({ msg: "Unable to update user" });
     }
 });
 
@@ -93,7 +93,7 @@ router.delete("/", async (req, res) => {
     }
     catch
     {
-        return res.status(500).json({ error: "Unable to delete user" });
+        return res.status(500).json({ msg: "Unable to delete user" });
     }
 })
 
