@@ -1,4 +1,5 @@
 export interface ProfilePostModel
 {
-    resumePdf: File;
+    resumePdf: File,
+    resumeFields: number[]
 }

@@ -45,10 +45,14 @@ app.use(jwtCheck);
 import dbAuth from "./middleware/dbAuth.js";
 
 import resumeRoutes from "./routes/resume.js";
+import registrationRoutes from "./routes/registration.js";
 import userRoutes from "./routes/user.js";
+import fieldRoutes from "./routes/fields.js";
 
+app.use("/fields", dbAuth, fieldRoutes);
 app.use("/resumes", dbAuth, resumeRoutes);
-app.use("/users", userRoutes);
+app.use("/users", dbAuth, userRoutes);
+app.use("/registration", registrationRoutes);
 
 
 const server = app.listen(port, () => {

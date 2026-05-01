@@ -90,8 +90,7 @@ router.post("/", upload.single("file"), async (req, res) => {
     const loggedInUser = req.user;
 
     // TENTATIVE -- WILL MAKE FIELD DYNAMIC
-    const fieldIds = [1];
-    // const fieldIds= req.body.fieldIds;
+    const fieldIds= req.body.fieldIds;
 
     let path = "";
     let public_url = "";

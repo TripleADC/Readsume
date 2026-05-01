@@ -15,7 +15,7 @@ export class LoginService
   private http = inject(HttpClient);
 
   login() {
-    return this.http.post(`${this.apiUrl}/users`, {})
+    return this.http.post(`${this.apiUrl}/registration`, {})
       .pipe(
         catchError((err) => {
           let errorMsg = err.error?.message || 'An unknown error occured';
