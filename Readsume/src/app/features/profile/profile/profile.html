@@ -1,11 +1,24 @@
 <div class="container mx-4 my-4">
     @if (pdfSrc != null)
     {
-        <pdf-viewer [src]="pdfSrc"
+       <div class="pdf-wrapper" style="position: relative; width: 800px; height: 900px;">
+            <pdf-viewer [src]="pdfSrc"
                 [render-text]="true"
                 [original-size]="false"
-                style="width: 800px; height: 900px"
-        ></pdf-viewer>
+                (after-load-complete)="onPdfLoaded($event)"
+                (page-rendered)="onPageRendered()"
+                style="width: 700px; height: 800px"
+            ></pdf-viewer>
+
+            <!-- Drawing canvas sits exactly on top -->
+            <canvas #drawCanvas
+                style="position: absolute; top: 0; left: 0; width: 700px; height: 800px; cursor: crosshair;"
+                [width]="700" [height]="800"
+                (mousedown)="startDraw($event)"
+                (mousemove)="onMouseMove($event); onDraw($event)"
+                (mouseup)="endDraw()">
+            </canvas>
+        </div>
     }
 
     <input class="mt-4 cursor-pointer bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-brand focus:border-brand block w-full shadow-xs placeholder:text-body" 
@@ -16,5 +29,10 @@
     <button type="button" class="mt-4 cursor-pointer text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
         (click)="submitResume()"
         [disabled]="pdfForm.invalid">Submit
+    </button>
+
+    <button type="button" class="mt-4 cursor-pointer text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+        (click)="downloadRedacted()"
+        [disabled]="pdfForm.invalid">Burn
     </button>
 </div>
