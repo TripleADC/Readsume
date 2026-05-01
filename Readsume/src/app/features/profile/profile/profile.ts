@@ -83,8 +83,21 @@ export class Profile
     }
   }
 
-  onPdfLoaded(pdf: PDFDocumentProxy) {
+  async onPdfLoaded(pdf: PDFDocumentProxy) {
     this.pdfDoc = pdf;
+
+    const page = await pdf.getPage(1);
+    const viewport = page.getViewport({ scale: 1 });
+
+    // scale to your fixed width, let height be whatever it needs to be
+    const scale = 700 / viewport.width;
+    const scaledHeight = Math.ceil(viewport.height * scale);
+
+    const viewer = document.querySelector('pdf-viewer') as HTMLElement;
+    if (viewer) {
+      viewer.style.width = '700px';
+      viewer.style.height = scaledHeight + 'px';
+    }
   }
 
   startDraw(e: MouseEvent) {
@@ -173,40 +186,49 @@ export class Profile
     const viewerCanvas = document.querySelector('pdf-viewer canvas') as HTMLCanvasElement;
     if (!viewerCanvas) return;
 
+    const viewerRect = viewerCanvas.getBoundingClientRect();
+    const wrapperRect = (document.querySelector('pdf-viewer') as HTMLElement).getBoundingClientRect();
+
+    const offsetLeft = viewerRect.left - wrapperRect.left;
+    const offsetTop = viewerRect.top - wrapperRect.top;
+
     // sync drawing canvas display size to viewer display size
     const canvas = this.canvasRef.nativeElement;
     canvas.style.width = viewerCanvas.offsetWidth + 'px';   // 684px
     canvas.style.height = viewerCanvas.offsetHeight + 'px'; // 886px
+    canvas.style.left = offsetLeft + 'px';  // shift to match inner canvas
+    canvas.style.top = offsetTop + 'px';
     canvas.width = viewerCanvas.offsetWidth;
     canvas.height = viewerCanvas.offsetHeight;
 
     this.canvasWidth = viewerCanvas.offsetWidth;
     this.canvasHeight = viewerCanvas.offsetHeight;
+
+    console.log('canvas left offset from viewer:', viewerRect.left - wrapperRect.left);
+    console.log('canvas top offset from viewer:', viewerRect.top - wrapperRect.top);
   }
 
-  async downloadRedacted() {
+  async downloadRedacted() 
+  {
     if (!this.pdfBytes || !this.pdfDoc) return;
 
-    const viewerCanvas = document.querySelector('pdf-viewer canvas') as HTMLCanvasElement;
-    if (!viewerCanvas) return;
-
-    // internal resolution — use this for quality
-    const internalW = viewerCanvas.width;   // 1026
-    const internalH = viewerCanvas.height;  // 1329
-
-    // scale from your drawing canvas → internal resolution
-    const scaleX = internalW / this.canvasWidth;   // 1026 / 700
-    const scaleY = internalH / this.canvasHeight;  // 1329 / 800
+    const pdfPage = await this.pdfDoc.getPage(1);
+    const exportScale = 3;
+    const exportViewport = pdfPage.getViewport({ scale: exportScale });
 
     const flatCanvas = document.createElement('canvas');
-    flatCanvas.width = internalW;
-    flatCanvas.height = internalH;
+    flatCanvas.width = exportViewport.width;
+    flatCanvas.height = exportViewport.height;
     const flatCtx = flatCanvas.getContext('2d')!;
 
-    // copy the already-rendered high-res canvas directly
-    flatCtx.drawImage(viewerCanvas, 0, 0);
+    await pdfPage.render({
+      canvasContext: flatCtx,
+      viewport: exportViewport
+    }).promise;
 
-    // scale box coords up to match internal resolution
+    const scaleX = exportViewport.width / this.canvasWidth;
+    const scaleY = exportViewport.height / this.canvasHeight;
+
     flatCtx.fillStyle = '#000000';
     for (const box of this.boxes) {
       flatCtx.fillRect(
@@ -220,8 +242,8 @@ export class Profile
     const imgData = flatCanvas.toDataURL('image/png');
     const newDoc = await PDFDocument.create();
     const pngImage = await newDoc.embedPng(imgData);
-    const newPage = newDoc.addPage([internalW, internalH]);
-    newPage.drawImage(pngImage, { x: 0, y: 0, width: internalW, height: internalH });
+    const newPage = newDoc.addPage([exportViewport.width, exportViewport.height]);
+    newPage.drawImage(pngImage, { x: 0, y: 0, width: exportViewport.width, height: exportViewport.height });
 
     const redactedBytes = await newDoc.save();
     const blob = new Blob([redactedBytes.buffer as ArrayBuffer], { type: 'application/pdf' });
