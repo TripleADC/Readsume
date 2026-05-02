@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 import { ProfilePostModel } from '../model/profile.post-model';
+import { ApiPostResponseModel } from '../../../shared/model/general/api.post-response-model';
 
 @Injectable({
   providedIn: 'root',
@@ -14,17 +15,19 @@ export class ProfileService
 
   private readonly apiUrl = `${environment.apiUrl}/resume`;
 
-  postResume(resume: ProfilePostModel) 
+  postResume(resume: ProfilePostModel): Observable<string>
   { 
     const formData = new FormData();
 
     formData.append('file', resume.resumePdf);
     formData.append('fieldIds', resume.resumeFields.join(","));
 
-    return this.httpClient.post(`${environment.apiUrl}/resumes`, formData)
+    return this.httpClient.post<ApiPostResponseModel>(`${environment.apiUrl}/resumes`, formData)
       .pipe(
-        catchError((err) => {
-          return throwError(() => new Error(err.error.msg));
+        map(x => x.msg),
+        catchError((err: HttpErrorResponse) => 
+        { 
+          return throwError(() => err);
         })
       );
   }

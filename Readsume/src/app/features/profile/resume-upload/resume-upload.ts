@@ -8,9 +8,12 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 
 import { ProfileService } from '../service/profile-service';
 import { FieldService } from '../../../shared/service/field-service';
+import { ToastService } from '../../../shared/service/toast-service';
+import { ErrorParsingService } from '../../../shared/service/error-parsing-service';
 
 import { BoundingBoxModel } from '../model/bounding-box.model';
 import { FieldGetModel } from '../../../shared/model/field/field.get-model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-resume-upload',
@@ -51,6 +54,8 @@ export class ResumeUpload
 
   private profileService = inject(ProfileService);
   private fieldService = inject(FieldService);
+  private toastService = inject(ToastService);
+  private errorParsingService = inject(ErrorParsingService);
   private destroyRef = inject(DestroyRef);
 
   ngOnInit() {
@@ -362,13 +367,13 @@ export class ResumeUpload
     this.profileService.postResume(newResume)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => {
-          console.log("pdf uploaded!");
+        next: (data) => {
+          this.toastService.success(data);
           this.router.navigate(['/home']);
         },
-        error: () =>
+        error: (error: HttpErrorResponse) =>
         {
-          console.log("pdf unsuccessful");
+          this.toastService.error(this.errorParsingService.parseError(error));
         }
       })
   }
