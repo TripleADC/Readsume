@@ -1,9 +1,6 @@
 import express from 'express';
 const router = express.Router();
 
-import multer from 'multer';
-const upload = multer({ storage: multer.memoryStorage() });
-
 import prisma_client from '../prisma_client.js';
 
 router.patch("/fields", async (req, res) => {

@@ -4,11 +4,13 @@ import { Router } from '@angular/router';
 import { PDFDocumentProxy, PdfViewerModule } from 'ng2-pdf-viewer';
 import { PDFDocument, rgb } from 'pdf-lib';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MultiSelectModule } from 'primeng/multiselect';
+import { NgSelectComponent } from '@ng-select/ng-select';
 
 import { ProfileService } from '../service/profile-service';
+import { FieldService } from '../../../shared/service/field-service';
 
 import { BoundingBoxModel } from '../model/bounding-box.model';
+import { FieldGetModel } from '../../../shared/model/field/field.get-model';
 
 @Component({
   selector: 'app-resume-upload',
@@ -16,7 +18,7 @@ import { BoundingBoxModel } from '../model/bounding-box.model';
     FormsModule,
     ReactiveFormsModule,
     PdfViewerModule,
-    MultiSelectModule
+    NgSelectComponent
   ],
   templateUrl: './resume-upload.html',
   styleUrl: './resume-upload.css',
@@ -43,18 +45,53 @@ export class ResumeUpload
   startX = 0; 
   startY = 0;
   activeBox: BoundingBoxModel | null = null;
+  fieldOptions: FieldGetModel[] = [];
 
   constructor(private router : Router){};
 
   private profileService = inject(ProfileService);
+  private fieldService = inject(FieldService);
   private destroyRef = inject(DestroyRef);
 
   ngOnInit() {
     document.addEventListener('keydown', this.onKeyDown.bind(this));
+
+    this.getFields();
+    this.getUserFields();
   }
 
   ngOnDestroy() {
     document.removeEventListener('keydown', this.onKeyDown.bind(this));
+  }
+
+  getFields() 
+  {
+    this.fieldService.getFields()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.fieldOptions = data;
+        },
+        error: (err) =>
+        {
+          console.log(err);
+        }
+      });
+  }
+
+  getUserFields()
+  {
+    this.fieldService.getUserFields()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          this.pdfForm.patchValue({ resumeFields: data.map(x => x.field) });
+        },
+        error: (err) =>
+        {
+          console.log(err);
+        }
+      });
   }
 
   onKeyDown(e: KeyboardEvent) {

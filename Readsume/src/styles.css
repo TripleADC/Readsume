@@ -8,6 +8,8 @@
 @plugin "flowbite/plugin";
 @source "../node_modules/flowbite";
 
+@import "@ng-select/ng-select/themes/default.theme.css";
+
 /* Fonts */
 @theme {
   --font-sans: 'Inter', sans-serif;

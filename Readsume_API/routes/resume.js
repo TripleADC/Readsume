@@ -89,15 +89,16 @@ router.post("/", upload.single("file"), async (req, res) => {
 	const file = req.file;
     const loggedInUser = req.user;
 
-    // TENTATIVE -- WILL MAKE FIELD DYNAMIC
-    const fieldIds= req.body.fieldIds;
+    let fieldIds = req.body.fieldIds;
 
     let path = "";
     let public_url = "";
 
-    if (file == null || fieldIds == null || fieldIds == []) {
+    if (file == null || fieldIds == null || fieldIds == "") {
       return res.status(400).json({ msg: "Required fields are null" });
     }
+
+    fieldIds = fieldIds.split(",").map(x => parseInt(x));
 
     // Making unique file name
     const ext = allowed[file.mimetype];

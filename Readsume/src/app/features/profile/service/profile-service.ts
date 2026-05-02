@@ -19,6 +19,7 @@ export class ProfileService
     const formData = new FormData();
 
     formData.append('file', resume.resumePdf);
+    formData.append('fieldIds', resume.resumeFields.join(","));
 
     return this.httpClient.post(`${environment.apiUrl}/resumes`, formData)
       .pipe(
