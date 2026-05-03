@@ -100,9 +100,18 @@ model Users {
   id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   created_at     DateTime         @default(now()) @db.Timestamptz(6)
   auth0_id       String?
+  display_name   String?
+  number_id      String?
   Resume         Resume[]
   ResumeComments ResumeComments[]
   ResumeReplies  ResumeReplies[]
   UserField      UserField[]
   UserResume     UserResume[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model DisplayNameOptions {
+  id          Int      @id @default(autoincrement())
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  animal_name String?
 }

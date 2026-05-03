@@ -5,8 +5,10 @@ import { Home } from './core/home/home';
 import { Login } from './core/login/login';
 import { ResumeUpload } from './features/profile/resume-upload/resume-upload';
 import { Profile } from './features/profile/profile/profile';
+import { DisplayName } from './features/display-name/display-name/display-name';
 
 import { AuthGuard } from '@auth0/auth0-angular';
+import { DisplayNameGuard } from './shared/guards/display-name.guard';
 
 export const routes: Routes = [
     {
@@ -24,15 +26,22 @@ export const routes: Routes = [
             },
             {
                 path: 'home',
-                component: Home
+                component: Home,
+                canActivate: [DisplayNameGuard]
             },
             {
                 path: 'profile',
-                component: Profile
+                component: Profile,
+                canActivate: [DisplayNameGuard]
             },
             {
                 path: 'resume-upload',
-                component: ResumeUpload
+                component: ResumeUpload,
+                canActivate: [DisplayNameGuard]
+            },
+            {
+                path: 'display-name',
+                component: DisplayName
             }
         ],
     },

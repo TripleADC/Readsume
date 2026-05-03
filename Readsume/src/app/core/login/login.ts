@@ -4,7 +4,7 @@ import { AuthService } from '@auth0/auth0-angular';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { LoginService } from './service/login-service';
+import { LoginService } from './service/login.service';
 
 @Component({
   selector: 'app-login',

@@ -48,7 +48,9 @@ import resumeRoutes from "./routes/resume.js";
 import registrationRoutes from "./routes/registration.js";
 import userRoutes from "./routes/user.js";
 import fieldRoutes from "./routes/fields.js";
+import displayNamesRoutes from "./routes/displayNames.js";
 
+app.use("/displayNames", dbAuth, displayNamesRoutes);
 app.use("/fields", dbAuth, fieldRoutes);
 app.use("/resumes", dbAuth, resumeRoutes);
 app.use("/users", dbAuth, userRoutes);

@@ -1,0 +1,24 @@
+<div class="w-full max-w-2xl mx-auto px-4 flex flex-col items-center my-4">
+
+    <form [formGroup]="displayNameForm">
+        <div class="flex items-center gap-2">
+            <span class="text-sm font-medium">anon-</span>
+            <select class="min-w-36 border border-gray-300 rounded-base text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-brand-medium"
+                formControlName="animalId">
+                @for (option of displayNameOptions; track option)
+                {
+                    <option [ngValue]="option.id">{{ option.animal_name }}</option>
+                }
+            </select>
+        </div>
+
+        <p class="text-xs text-gray-400 mt-1">#{{ number_id }}</p>
+
+        <div class="flex mt-4 gap-2">
+            <button type="button" class="mt-4 cursor-pointer text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+                (click)="postDisplayName()">Submit
+            </button>
+        </div>
+    </form>
+    
+</div>

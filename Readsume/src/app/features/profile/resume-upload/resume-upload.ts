@@ -6,7 +6,7 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
-import { ProfileService } from '../service/profile-service';
+import { ProfileService } from '../service/profile.service';
 import { FieldService } from '../../../shared/service/field-service';
 import { ToastService } from '../../../shared/service/toast-service';
 import { ErrorParsingService } from '../../../shared/service/error-parsing-service';
