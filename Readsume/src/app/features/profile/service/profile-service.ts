@@ -3,7 +3,10 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
-import { ProfilePostModel } from '../model/profile.post-model';
+import { ResumePostModel } from '../model/resume.post-model';
+import { ResumeMeGetModel } from '../model/resume.me.get-model';
+
+import { ApiGetModel } from '../../../shared/model/general/api.get-model';
 import { ApiPostResponseModel } from '../../../shared/model/general/api.post-response-model';
 
 @Injectable({
@@ -13,9 +16,21 @@ export class ProfileService
 {
   private httpClient = inject(HttpClient);
 
-  private readonly apiUrl = `${environment.apiUrl}/resume`;
+  private readonly apiUrl = `${environment.apiUrl}`;
 
-  postResume(resume: ProfilePostModel): Observable<string>
+  getMyResumes(): Observable<ResumeMeGetModel[]>
+  {
+    return this.httpClient.get<ApiGetModel<ResumeMeGetModel>>(`${environment.apiUrl}/resumes/me`)
+      .pipe(
+        map(x => x.data),
+        catchError((err: HttpErrorResponse) => 
+        { 
+          return throwError(() => err);
+        })
+      );
+  }
+
+  postResume(resume: ResumePostModel): Observable<string>
   { 
     const formData = new FormData();
 

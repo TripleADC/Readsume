@@ -7,7 +7,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 import prisma_client from '../prisma_client.js';
 import supabase from '../supabase.js';
 
- const allowed = {
+import { pdfToImg } from "pdftoimg-js";
+
+const allowed = {
     "application/pdf": "pdf"
 };
 
@@ -50,7 +52,25 @@ router.get("/", async (req, res) => {
     }
     
 	// Return the resume, 
-	res.status(201).json();
+	res.status(200).json();
+});
+
+router.get("/me", async (req, res) => {
+    const loggedInUser = req.user;
+
+    var results = await prisma_client.resume.findMany({
+        where: {
+            created_by: loggedInUser.id
+        },
+        select: {
+            id: true,
+            public: true,
+            public_url: true,
+            thumbnail_url: true
+        }
+    });
+
+    res.status(200).json({ data: results, msg: "Successfully retrieved my resumes" });
 });
 
 // Getting a specific resume + their comments + replies
@@ -79,7 +99,7 @@ router.get("/:resumeId", async (req, res) => {
     });
     
     // Return the resume comment
-    res.status(201).json(results);
+    res.status(200).json({ data: results, msg: "Successfully retrieved resume" });
 });
 
 // Uploading a resume
@@ -93,6 +113,8 @@ router.post("/", upload.single("file"), async (req, res) => {
 
     let path = "";
     let public_url = "";
+    let thumbnail_path = "";
+    let thumbnail_url = "";
 
     if (file == null || fieldIds == null || fieldIds == "") {
       return res.status(400).json({ msg: "Required fields are null" });
@@ -107,13 +129,13 @@ router.post("/", upload.single("file"), async (req, res) => {
     }
 
     const sanitizedId = loggedInUser.id.replace(/\|/g, "_");
-    const filePath = `resumes/${sanitizedId}/${Date.now()}.${ext}`;
+    const filePath = `${sanitizedId}/${Date.now()}`;
 
     try 
     {
-        const { data, error } = await supabase.storage
+        const { data: uploadData, error } = await supabase.storage
             .from("resume")
-            .upload(filePath, file.buffer, {
+            .upload(`resumes/${filePath}.${ext}`, file.buffer, {
                 contentType: file.mimetype,
                 upsert: false,
             });
@@ -122,22 +144,49 @@ router.post("/", upload.single("file"), async (req, res) => {
                 throw error;
             }
         
-            path = data.path;
-    }
-    catch (err)
-    {
-        console.error("Supabase upload error:", err);
-        return res.status(500).json({ msg: "Resume unable to be uploaded" });
-    }
+            path = uploadData.path;
 
-    // Getting public url
-    try 
-    {
-        const { data } = await supabase.storage
+        const { data: urlData } = await supabase.storage
             .from("resume")
             .getPublicUrl(path)
 
-        public_url = data.publicUrl;
+            public_url = urlData.publicUrl;
+    }
+    catch (err)
+    {
+        return res.status(500).json({ msg: "Resume unable to be uploaded" });
+    }
+
+    try 
+    {
+        const image = await pdfToImg(file.buffer, {
+            pages: "firstPage",
+            imgType: "jpg",
+            scale: 0.20,
+            background: "white",
+        });
+
+        const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
+        const thumbnailBuffer = Buffer.from(base64Data, "base64");
+
+        const { data: uploadData, error } = await supabase.storage
+            .from("resume")
+            .upload(`pics/${filePath}.jpg`, thumbnailBuffer, {
+                contentType: "image/jpg",
+            });
+
+            if (error != null) 
+            {
+                throw error;
+            }
+        
+            thumbnail_path = uploadData.path;
+
+        const { data: urlData } = await supabase.storage
+            .from("resume")
+            .getPublicUrl(thumbnail_path)
+
+            thumbnail_url = urlData.publicUrl;
     }
     catch
     {
@@ -152,6 +201,7 @@ router.post("/", upload.single("file"), async (req, res) => {
                 public: true,
                 object_key: path,
                 public_url: public_url,
+                thumbnail_url: thumbnail_url,
                 created_by: loggedInUser.id,
                 engagement_score: 0
             }

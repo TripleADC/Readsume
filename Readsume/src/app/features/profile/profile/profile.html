@@ -1,1 +1,17 @@
-<p>profile works!</p>
+<div class="w-full max-w-2xl mx-auto px-4 flex flex-col items-center my-4">
+    <div class="flex gap-4">
+        @for (resume of resumes; track resume.id)
+        {
+            <figure class="w-35">
+                <img class="h-auto max-w-full rounded-base" [src]="resume.thumbnail_url" alt="image description">
+            </figure>
+        }
+    </div>
+
+    <div class="flex mt-4 gap-2">
+        <button type="button" class="mt-4 cursor-pointer text-white bg-brand box-border border border-transparent hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs font-medium leading-5 rounded-base text-sm px-4 py-2.5 focus:outline-none"
+            [routerLink]="['/resume-upload']">New Resume
+        </button>
+    </div>
+    
+</div>
