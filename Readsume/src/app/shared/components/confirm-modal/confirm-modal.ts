@@ -8,10 +8,10 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ConfirmModal 
 {
-  @Input() message = 'Are you sure?';
-  @Input() warning = 'This action cannot be undone.';
-  @Input() confirmLabel = 'Confirm';
-  @Input() cancelLabel = 'Cancel';
+  @Input() message : string = 'Are you sure?';
+  @Input() warning : string = '';
+  @Input() confirmLabel : string = 'Confirm';
+  @Input() cancelLabel : string = 'Cancel';
 
   @Input() isOpen = false;
 

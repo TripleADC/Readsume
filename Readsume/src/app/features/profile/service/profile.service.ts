@@ -47,7 +47,7 @@ export class ProfileService
       );
   }
 
-  toggleResume(resumeId: number): Observable<string>
+  toggleResume(resumeId: string): Observable<string>
   {
     return this.httpClient.patch<ApiPostResponseModel>(`${environment.apiUrl}/resumes/status`, { resumeId: resumeId })
       .pipe(
@@ -59,7 +59,7 @@ export class ProfileService
       );
   }
 
-  deleteResume(resumeId: number): Observable<string>
+  deleteResume(resumeId: string): Observable<string>
   {
     return this.httpClient.delete<ApiPostResponseModel>(`${environment.apiUrl}/resumes/${resumeId}`)
       .pipe(

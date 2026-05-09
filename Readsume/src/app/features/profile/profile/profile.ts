@@ -9,9 +9,14 @@ import { ProfileService } from '../service/profile.service';
 import { ErrorParsingService } from '../../../shared/service/error-parsing-service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { ResumePreviewComponent } from '../resume-preview-component/resume-preview-component';
+
 @Component({
   selector: 'app-profile',
-  imports: [RouterLink],
+  imports: [
+    RouterLink,
+    ResumePreviewComponent
+  ],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })

@@ -77,9 +77,9 @@ export class ResumeUpload
         next: (data) => {
           this.fieldOptions = data;
         },
-        error: (err) =>
+        error: (error: HttpErrorResponse) =>
         {
-          console.log(err);
+          this.toastService.error(this.errorParsingService.parseError(error));
         }
       });
   }
@@ -92,9 +92,9 @@ export class ResumeUpload
         next: (data) => {
           this.pdfForm.patchValue({ resumeFields: data.map(x => x.field) });
         },
-        error: (err) =>
+        error: (error: HttpErrorResponse) =>
         {
-          console.log(err);
+          this.toastService.error(this.errorParsingService.parseError(error));
         }
       });
   }

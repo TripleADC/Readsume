@@ -2,9 +2,7 @@
     <div class="flex gap-4">
         @for (resume of resumes; track resume.id)
         {
-            <figure class="w-35">
-                <img class="h-auto max-w-full rounded-base" [src]="resume.thumbnail_url" alt="image description">
-            </figure>
+            <app-resume-preview-component [resumeToDisplay]="resume"></app-resume-preview-component>
         }
     </div>
 

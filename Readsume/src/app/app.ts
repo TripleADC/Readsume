@@ -8,14 +8,16 @@ import { CommonModule } from '@angular/common';
 import { ToastComponent } from './shared/components/toast-component/toast-component';
 
 import { initFlowbite } from 'flowbite';
+import { ConfirmModal } from "./shared/components/confirm-modal/confirm-modal";
 
 @Component({
   selector: 'app-root',
   imports: [
     RouterOutlet,
     CommonModule,
-    ToastComponent
-  ],
+    ToastComponent,
+    ConfirmModal
+],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

@@ -1,8 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 
 interface ConfirmOptions {
-  title?: string;
   message?: string;
+  warning?: string;
   confirmLabel?: string;
   cancelLabel?: string;
 }
@@ -17,7 +17,8 @@ export class ConfirmModalService
 
   private resolveFn?: (value: boolean) => void;
 
-  open(options: ConfirmOptions = {}): Promise<boolean> {
+  open(options: ConfirmOptions = {}): Promise<boolean> 
+  {
     this.options = options;
     this.isOpen.set(true);
 
