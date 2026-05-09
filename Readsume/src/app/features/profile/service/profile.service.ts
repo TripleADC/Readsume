@@ -46,4 +46,28 @@ export class ProfileService
         })
       );
   }
+
+  toggleResume(resumeId: number): Observable<string>
+  {
+    return this.httpClient.patch<ApiPostResponseModel>(`${environment.apiUrl}/resumes/status`, { resumeId: resumeId })
+      .pipe(
+        map(x => x.msg),
+        catchError((err: HttpErrorResponse) => 
+        { 
+          return throwError(() => err);
+        })
+      );
+  }
+
+  deleteResume(resumeId: number): Observable<string>
+  {
+    return this.httpClient.delete<ApiPostResponseModel>(`${environment.apiUrl}/resumes/${resumeId}`)
+      .pipe(
+        map(x => x.msg),
+        catchError((err: HttpErrorResponse) => 
+        { 
+          return throwError(() => err);
+        })
+      );
+  }
 }

@@ -315,4 +315,39 @@ router.patch("/fields", async (req, res) => {
     }
 });
 
+router.delete("/:resumeId", async (req, res) => {
+    const resumeId = req.params.resumeId;
+
+    if (resumeId == null)
+    {
+        return res.status(400).json({ msg: "Resume is null" });
+    }
+
+    const resumeToEdit = await prisma_client.resume.findFirst({
+        where: {
+            id: resumeId
+        }
+    });
+
+    if (resumeToEdit == null)
+    {
+        return res.status(400).json({ msg: "Resume not found" });
+    }
+
+    try 
+    {
+        await prisma_client.resume.delete({
+            where: {
+                id: resumeId
+            }
+        })
+
+        return res.status(200).json({ msg: "Resume successfully deleted" });
+    }
+    catch
+    {
+        return res.status(500).json({ msg: "Unable to delete resume" });
+    }
+});
+
 export default router;
