@@ -203,7 +203,8 @@ router.post("/", upload.single("file"), async (req, res) => {
                 public_url: public_url,
                 thumbnail_url: thumbnail_url,
                 created_by: loggedInUser.id,
-                engagement_score: 0
+                engagement_score: 0,
+                thumbnail_object_key: thumbnail_path
             }
         });
 
@@ -323,19 +324,29 @@ router.delete("/:resumeId", async (req, res) => {
         return res.status(400).json({ msg: "Resume is null" });
     }
 
-    const resumeToEdit = await prisma_client.resume.findFirst({
+    const resumeToDelete = await prisma_client.resume.findFirst({
         where: {
             id: resumeId
         }
     });
 
-    if (resumeToEdit == null)
+    if (resumeToDelete == null)
     {
         return res.status(400).json({ msg: "Resume not found" });
     }
 
     try 
     {
+        // Deleting the actual ones
+        const { error } = await supabase.storage
+            .from("resume")
+            .remove([resumeToDelete.object_key, resumeToDelete.thumbnail_object_key]);
+
+        if (error != null) 
+        {
+            throw error;
+        }
+
         await prisma_client.resume.delete({
             where: {
                 id: resumeId
