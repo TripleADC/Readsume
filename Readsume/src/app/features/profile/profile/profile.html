@@ -1,8 +1,8 @@
 <div class="w-full max-w-2xl mx-auto px-4 flex flex-col items-center my-4">
     <div class="flex gap-4">
-        @for (resume of resumes; track resume.id)
+        @for (resume of resumes(); track resume.id)
         {
-            <app-resume-preview-component [resumeToDisplay]="resume"></app-resume-preview-component>
+            <app-resume-preview-component [resumeToDisplay]="resume" (resumeUpdated)="getMyResumes()"></app-resume-preview-component>
         }
     </div>
 

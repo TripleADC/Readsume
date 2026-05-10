@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output } from '@angular/core';
+
+import { ConfirmModalService } from '../../service/confirm-modal-service';
 
 @Component({
   selector: 'app-confirm-modal',
@@ -8,21 +10,16 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class ConfirmModal 
 {
-  @Input() message : string = 'Are you sure?';
-  @Input() warning : string = '';
-  @Input() confirmLabel : string = 'Confirm';
-  @Input() cancelLabel : string = 'Cancel';
-
-  @Input() isOpen = false;
+  confirmModalService = inject(ConfirmModalService);
 
   @Output() confirmed = new EventEmitter<void>();
   @Output() cancelled = new EventEmitter<void>();
 
   onConfirm() {
-    this.confirmed.emit();
+    this.confirmModalService.confirm();
   }
 
   onCancel() {
-    this.cancelled.emit();
+    this.confirmModalService.cancel();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -22,7 +22,7 @@ import { ResumePreviewComponent } from '../resume-preview-component/resume-previ
 })
 export class Profile 
 {
-  resumes : ResumeMeGetModel[] = [];
+  resumes = signal<ResumeMeGetModel[]>([]);
 
   private router = inject(Router);
   private profileService = inject(ProfileService);
@@ -37,12 +37,14 @@ export class Profile
 
   getMyResumes()
   {
+    this.resumes.set([]);
+
     this.profileService.getMyResumes()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => 
         {
-          this.resumes = data;
+          this.resumes.set(data);
         },
         error: (error: HttpErrorResponse) =>
         {

@@ -17,9 +17,15 @@ export class ConfirmModalService
 
   private resolveFn?: (value: boolean) => void;
 
-  open(options: ConfirmOptions = {}): Promise<boolean> 
+  open(options: ConfirmOptions): Promise<boolean> 
   {
-    this.options = options;
+    this.options = {
+      message: options.message ?? 'Are you sure?',
+      confirmLabel: options.confirmLabel ?? 'Confirm',
+      cancelLabel: options.cancelLabel ?? 'Cancel',
+      warning: options.warning,
+    };
+    
     this.isOpen.set(true);
 
     return new Promise<boolean>((resolve) => {

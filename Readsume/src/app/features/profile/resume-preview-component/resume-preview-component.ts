@@ -1,4 +1,4 @@
-import { Component, Input, DestroyRef, inject, SimpleChanges } from '@angular/core';
+import { Component, Input, DestroyRef, inject, SimpleChanges, Output, EventEmitter } from '@angular/core';
 import { Router, RouterLink } from "@angular/router";
 import { HttpErrorResponse } from '@angular/common/http';
 
@@ -20,6 +20,8 @@ export class ResumePreviewComponent
 {
   @Input() resumeToDisplay!: ResumeMeGetModel;
 
+  @Output() resumeUpdated = new EventEmitter<void>();
+
   private toastService = inject(ToastService);
   private profileService = inject(ProfileService);
   private confirmModalService = inject(ConfirmModalService);
@@ -27,16 +29,9 @@ export class ResumePreviewComponent
 
   private destroyRef = inject(DestroyRef);
 
-  ngOnChanges(changes: SimpleChanges)
-  {
-    if (changes['resumeToDisplay'])
-    {
-      this.resumeToDisplay = changes['resumeToDisplay'].currentValue;
-    }
-  }
-
   async toggleResume()
   {
+    console.log('hitting toggle');
     const messageToUse = this.resumeToDisplay.public == true ? "Are you sure you want to make this resume private?" : "Are you sure you want to make this resume public?";
 
     const confirmed : boolean = await this.confirmModalService.open({ message: messageToUse });
@@ -48,7 +43,8 @@ export class ResumePreviewComponent
         .subscribe({
           next: (data) => 
           {
-            this.toastService.show(data);
+            this.toastService.success(data);
+            this.resumeUpdated.emit();
           },
           error: (error: HttpErrorResponse) =>
           {
@@ -72,7 +68,8 @@ export class ResumePreviewComponent
         .subscribe({
           next: (data) => 
           {
-            this.toastService.show(data);
+            this.toastService.success(data);
+            this.resumeUpdated.emit();
           },
           error: (error: HttpErrorResponse) =>
           {
